@@ -1,0 +1,450 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# __Statistical tests for association__
+
+__Fisher's exact test__
+
+__Data__
+
+| Allele | A | G |||||||||
+|:------|:-----:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|
+| Case | 10  | 12 |||||||||
+| Control | 66  | 26  |||||||||           
+
+```{r}
+fisher.test(matrix(c(12, 10, 26, 66), nrow=2))
+```
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+__Dominent model__
+
+| Allele | AA | *G |||||||||
+|:------|:-----:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|
+| Case | 5  | 6 |||||||||
+| Control | 23  | 23  |||||||||           
+    
+
+
+__Recessive model__
+
+| Allele | A* | GG |||||||||
+|:------|:-----:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|-------:|
+| Case | 5  | 6 |||||||||
+| Control | 43  | 3  |||||||||           
+    
+
+
+```{r}
+fisher.test(matrix(c(6, 5, 23, 23), nrow=2))
+```
+
+```{r}
+fisher.test(matrix(c(6, 5, 3, 43), nrow=2))
+
+```
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+__Pearson's Chi-squared test__
+```{r}
+chisq.test(matrix(c(6, 5, 3, 43), nrow=2))
+```
+
+```{r}
+chisq.test(matrix(c(6, 5, 23, 23), nrow=2))
+```
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+__Cochran-Armitage Trend Test__
+
+```{r}
+library(SNPassoc)
+library(coin)
+data(SNPs)
+SNPs[1:10, 1:10]
+```
+
+
+
+
+
+```{r, echo=FALSE, fig.width=200, message=FALSE, warning=FALSE}
+library(knitr)
+kable(SNPs[1:10, 1:10])
+```
+
+
+
+
+
+```{r}
+datSNP <- setupSNP(SNPs,6:40,sep="")
+xtabs(~ casco + snp10001, data=datSNP)
+```
+
+
+
+```{r}
+independence_test(casco~snp10001, data=datSNP, teststat="quad", scores=list(snp10001=c(0,1,2)))
+```
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+__HWE(Hardy-Weinberg Equilibrium) test__
+```{r}
+library(SNPassoc)
+data(SNPs)
+pre_SNPs<-snp(SNPs$snp10005,sep="")
+summary(pre_SNPs)
+```
+
+```{r}
+plot(pre_SNPs, label="snp10005", col="red")
+```
+
+
+
+```{r}
+myData<-setupSNP(data=SNPs,colSNPs=6:40,sep="")
+res<-tableHWE(myData)
+head(res, n=10)
+
+```
+
+```{r}
+SNPs[,8]
+```
+
+```{r}
+res<-tableHWE(myData,strata=myData$sex)
+head(res, n=10)
+```
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+__MANHATTAN Plot__
+
+
+```{r}
+library(qqman)
+head(gwasResults, n=6)
+```
+```{r, echo=FALSE}
+kable(head(gwasResults, n=6))
+```
+
+```{r}
+manhattan(gwasResults, main = "Manhattan Plot", cex = 0.5, cex.axis = 0.8, col = c("blue4", "orange3"))
+```
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+#Rare variant association test
+
+```{r}
+library(seqMeta)
+data(seqMetaExample)
+
+?seqMetaExample
+```
+
+```{r}
+dim(Z1)
+```
+```{r}
+Z1[1:5,1:5]
+```
+```{r}
+Z2[1:5,1:5]
+head(pheno1)
+head(pheno2)
+```
+
+
+
+__Burden test__
+```{r}
+cohort1 <- prepScores(Z=Z1, y~1, SNPInfo=SNPInfo, data=pheno1)
+cohort2 <- prepScores(Z=Z2, y~1, SNPInfo=SNPInfo, data=pheno2)
+out <- burdenMeta(cohort1, cohort2, SNPInfo = SNPInfo, mafRange=c(0, 0.01))
+
+out$p
+which(out$p < 0.05)
+```
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+__SKAT test__¡¡¡¡¡¡¡¡¡¡
+
+Sequence Kernel Association Test
+
+```{r}
+cohort1 <- prepScores(Z=Z1, y~sex+bmi, SNPInfo = SNPInfo,data =pheno1)
+cohort2 <- prepScores(Z=Z2, y~sex+bmi, SNPInfo = SNPInfo,kins=kins, data=pheno2)
+out.skat <- skatMeta(cohort1, cohort2, SNPInfo = SNPInfo)
+out.skat[ order(out.skat$p), ]
+```
+
+¡¡¡¡¡¡¡¡¡¡
+```{r, echo=FALSE}
+kable(head(out.skat[ order(out.skat$p), ]))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+__SKAT-O test__¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡¡
+
+
+
+```{r}
+out.skat <- skatOMeta(cohort1, cohort2, SNPInfo = SNPInfo)
+out.skat[ order(out.skat$p), ]
+```
+```{r, echo=FALSE}
+kable(head(out.skat[ order(out.skat$p), ]))
+```
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
+
+¡¡¡¡¡¡¡¡¡¡
+
+
